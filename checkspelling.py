@@ -63,9 +63,8 @@ def checkspellerror(file_path):
     except IOError:
         print(f"Error reading file '{file_path}'.")
 
-        
-"""
-provide the file path here 
-"""
-file_path='/home/gops/projects/woodfrog.tech/spellchecker/data/corpus.txt'
+
+with open("/home/gops/projects/woodfrog.tech/python spell check final/filepath.txt", 'r') as file:
+    file_path = file.read()
+
 checkspellerror(file_path)
