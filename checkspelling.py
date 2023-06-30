@@ -32,16 +32,18 @@ def checkspellerror(file_path):
         # Cleaning- optional 
         # cleaned_tokens = [token for token in tokens if token.isalpha()] # keeping only text with all aplhabetic words
         for token in tokens:
-            if token not in word_frequency:
-                word_frequency[token] = 1
-            else:
-                word_frequency[token] = +1 
+
             if token=="END-OF-CORPUS":
                 break           
             if is_valid_word(token):
+                if token not in word_frequency:
+                  word_frequency[token] = 1
+                else:
+                  word_frequency[token] = +1 
                 cleaned_tokens.append(token)
           
-
+        with open('word_frequency.json', 'w') as file2:
+            json.dump(word_frequency, file2)
             
         stopwords = nltk.corpus.stopwords.words('english')  
         
@@ -75,8 +77,7 @@ def checkspellerror(file_path):
         with open('original_corpus.txt','w') as file1:
               file1.write(content)
 
-        with open('word_frequency', 'w') as file2:
-            json.dump(word_frequency, file2)
+  
 
 
         print("All suggestions are loaded to 'enchant_suggestion.json' file for Manual review ")
