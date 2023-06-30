@@ -9,6 +9,13 @@ from tqdm import tqdm
 import enchant
 import json 
 import enchant
+import re
+
+def is_valid_word(word):
+    # Regular expression pattern to match valid words
+    pattern = r"^[a-zA-Z0-9\-']+$"
+    return re.match(pattern, word) is not None
+
 ench_d = enchant.Dict("en_US")
 
 def checkspellerror(file_path):
@@ -20,9 +27,22 @@ def checkspellerror(file_path):
 
         #cleaning of text 
         tokens = word_tokenize(content)
-
+        word_frequency = {}
+        cleaned_tokens=[]
         # Cleaning- optional 
-        cleaned_tokens = [token for token in tokens if token.isalpha()] # keeping only text with all aplhabetic words
+        # cleaned_tokens = [token for token in tokens if token.isalpha()] # keeping only text with all aplhabetic words
+        for token in tokens:
+            if token not in word_frequency:
+                word_frequency[token] = 1
+            else:
+                word_frequency[token] = +1 
+            if token=="END-OF-CORPUS":
+                break           
+            if is_valid_word(token):
+                cleaned_tokens.append(token)
+          
+
+            
         stopwords = nltk.corpus.stopwords.words('english')  
         
         filtered_tokens = [token for token in cleaned_tokens if token not in stopwords] # removing stopwords (optional )
@@ -32,7 +52,7 @@ def checkspellerror(file_path):
         # Loading Enchant Dictionary 
 
         # ench_d = enchant.Dict("en_US")
-
+        word_frequency = {}
         from tqdm import tqdm
         misspelled =[]
         for word in tqdm(filtered_tokens):
@@ -55,6 +75,10 @@ def checkspellerror(file_path):
         with open('original_corpus.txt','w') as file1:
               file1.write(content)
 
+        with open('word_frequency', 'w') as file2:
+            json.dump(word_frequency, file2)
+
+
         print("All suggestions are loaded to 'enchant_suggestion.json' file for Manual review ")
 
             
@@ -64,7 +88,7 @@ def checkspellerror(file_path):
         print(f"Error reading file '{file_path}'.")
 
 
-with open("/home/gops/projects/woodfrog.tech/python spell check final/filepath.txt", 'r') as file:
+with open("/home/gops/projects/woodfrog.tech/spellchecker/filepath.txt", 'r') as file:
     file_path = file.read()
 
 checkspellerror(file_path)

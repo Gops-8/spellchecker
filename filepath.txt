@@ -1,1 +1,1 @@
-/home/gops/projects/woodfrog.tech/python spell check final/corpus.txt
+/home/gops/projects/woodfrog.tech/spellchecker/corpus.txt
