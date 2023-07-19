@@ -1,22 +1,56 @@
 #import modules 
-
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.corpus import words
+
 from tqdm import tqdm
-# nltk.download('punkt')
-# nltk.download('stopwords')  
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('words')  
 import enchant
 import json 
 import enchant
 import re
+
+def levenshtein_distance(s1, s2):
+    if len(s1) > len(s2):
+        s1, s2 = s2, s1
+    distances = range(len(s1) + 1)
+    for index2, char2 in enumerate(s2):
+        new_distances = [index2 + 1]
+        for index1, char1 in enumerate(s1):
+            if char1 == char2:
+                new_distances.append(distances[index1])
+            else:
+                new_distances.append(1 + min((distances[index1], distances[index1 + 1], new_distances[-1])))
+        distances = new_distances
+    return distances[-1]
+
+## Suggestion based on levenshtein distance 
+
+def suggest_replacement(word, suggestions_count=5):
+
+    word_list = words.words()
+    suggestions = []
+    for w in word_list:
+        if len(w) == len(word) and w[0].islower() and w.isalpha():
+            distance = levenshtein_distance(word, w)
+            suggestions.append((w, distance))
+    suggestions.sort(key=lambda x: x[1])
+
+    return [s[0] for s in suggestions[:suggestions_count]]
+
 
 def is_valid_word(word):
     # Regular expression pattern to match valid words
     pattern = r"^[a-zA-Z0-9\-']+$"
     return re.match(pattern, word) is not None
 
+
+
 ench_d = enchant.Dict("en_US")
+
 
 def checkspellerror(file_path):
 
@@ -68,19 +102,17 @@ def checkspellerror(file_path):
 
         json_output=[]
         for word in tqdm(misspelled_list):
-            corrected_word = ench_d.suggest(word)
+            corrected_word = suggest_replacement(word)
             json_output.append({word:corrected_word})
 
-        with open('enchant_suggestion.json', 'w') as file:
+        with open('dictonary_of_suggestion.json', 'w') as file:
              json.dump(json_output, file, indent=4)
         
-        with open('original_corpus.txt','w') as file1:
-              file1.write(content)
-
-  
+        # with open('original_corpus.txt','w') as file1:
+        #       file1.write(content)
 
 
-        print("All suggestions are loaded to 'enchant_suggestion.json' file for Manual review ")
+        print("All suggestions are loaded to 'dictonary_of_suggestion.json' file for Manual review ")
 
             
     except FileNotFoundError:
@@ -89,7 +121,7 @@ def checkspellerror(file_path):
         print(f"Error reading file '{file_path}'.")
 
 
-with open("/home/gops/projects/woodfrog.tech/spellchecker/filepath.txt", 'r') as file:
+with open("filepath.txt", 'r') as file:
     file_path = file.read()
 
 checkspellerror(file_path)
