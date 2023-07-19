@@ -21,9 +21,10 @@ try:
         for key, value in elem.items():
             rplc_w=key
             try:
-                crct_w=value[0]
+                crct_w=value[0].lower()
                 pattern = r'\b{}\b'.format(re.escape(rplc_w))
                 new_content = re.sub(pattern, crct_w, new_content)
+
             except:
                 file2.write(rplc_w+'\n')
             
