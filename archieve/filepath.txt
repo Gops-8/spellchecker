@@ -1,0 +1,1 @@
+/home/gops/projects/woodfrog.tech/spellchecker/archieve/data/sampletext.txt
